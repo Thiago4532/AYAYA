@@ -47,6 +47,53 @@ public:
 		return v[i];
 	}
 
+	matrix<t, m, n> transpose() const {
+		matrix<t, m, n> ans;
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < m; j++)
+				ans[i][j] = v[j][i];
+		return ans;
+	}
+
+	matrix<t, m, n> operator~() const {
+		return transpose();
+	}
+
+	matrix<t, n, m>& apply_hadamard(matrix<t, n, m>& mat) {
+		for (int i = 0; i < n; i++)
+			for(int j = 0; j < m; j++)
+				v[i][j] *= mat[i][j];
+		return *this;
+	}
+
+	matrix<t, n, m> operator+(matrix<t, n, m> const &rhs) const {
+		matrix<t, n, m> ans;
+		for(int i = 0; i < n; i++)
+			for(int j = 0; j < m; j++)
+				ans[i][j] = v[i][j] + rhs[i][j];
+	}
+
+	matrix<t, n, m>& operator+=(matrix<t, n, m> const& rhs) {
+		for(int i = 0; i < n; i++)
+			for(int j = 0; j < m; j++)
+				v[i][j] += rhs[i][j];
+		return *this;
+	}
+
+	matrix<t, n, m> operator-(matrix<t, n, m> const &rhs) const {
+		matrix<t, n, m> ans;
+		for(int i = 0; i < n; i++)
+			for(int j = 0; j < m; j++)
+				ans[i][j] = v[i][j] - rhs[i][j];
+	}
+
+	matrix<t, n, m>& operator-=(matrix<t, n, m> const& rhs) {
+		for(int i = 0; i < n; i++)
+			for(int j = 0; j < m; j++)
+				v[i][j] -= rhs[i][j];
+		return *this;
+	}
+
 	template<int p>
 	matrix<t, n, p> operator*(matrix<t, m, p> const& rhs) const {
 		matrix<t, n, p> ans;
@@ -66,6 +113,34 @@ public:
 private:
 	t v[n][m];
 };
+
+// MULTIPLICATION BY A SCALAR
+
+template<typename t, int n, int m>
+matrix<t, n, m> operator*(matrix<t, n, m> const& mat, t const& x) {
+	matrix<t, n, m> ans;
+	for(int i = 0; i < n; i++)
+		for(int j = 0; j < m; j++)
+			ans[i][j] = mat[i][j]*x;
+	return ans;
+}
+
+template<typename t, int n, int m>
+matrix<t, n, m> operator*(t const& x, matrix<t, n, m> const& mat) {
+	matrix<t, n, m> ans;
+	for(int i = 0; i < n; i++)
+		for(int j = 0; j < m; j++)
+			ans[i][j] = x*mat[i][j];
+	return ans;
+}
+
+template<typename t, int n, int m>
+matrix<t, n, m>& operator*=(matrix<t, n, m>& mat, t const& x) {
+	for(int i = 0; i < n; i++)
+		for(int j = 0; j < m; j++)
+			mat[i][j] *= x;
+	return mat;
+}
 
 // APPLY VECTORIZED FUNCTIONS
 template<typename t, typename lambda, int n, int m>
@@ -89,12 +164,34 @@ matrix<t, n, m>& apply_ref(matrix<t, n, m>& mat, std::function<t(t)> const& func
 	return mat;
 }
 
+// HADAMARD PRODUCT ( % )
+
+template<typename t, int n, int m>
+matrix<t, n, m> hadamard(matrix<t, n, m> const& lhs, matrix<t, n, m> const& rhs) {
+	matrix<t, n, m> ans;
+	for(int i = 0; i < n; i++) 
+		for(int j = 0; j < m; j++)
+			ans[i][j] = lhs[i][j] * rhs[i][j];
+	return ans;
+}
+
+template<typename t, int n, int m>
+matrix<t, n, m> operator%(matrix<t, n, m> const& lhs, matrix<t, n, m> const& rhs) {
+	return hadamard(lhs, rhs);
+}
+
+template<typename t, int n, int m>
+matrix<t, n, m> operator%=(matrix<t, n, m>& lhs, matrix<t, n, m> const& rhs) {
+	return lhs.apply_hadamard(rhs);
+}
+
+
 // POWER OPERATOR
-using std::cout;
+
 template<typename t, int n>
-matrix<t, n, n> operator^(matrix<t, n, n> mat, int p) {
+matrix<t, n, n> power(matrix<t, n, n> mat, int p) {
 	if(p <= 0)
-		throw std::runtime_error("matrix operator^: power error");
+		throw std::runtime_error("matrix power: power error");
 
 	bool used = false;
 	matrix<t, n, n> ans;
@@ -110,6 +207,11 @@ matrix<t, n, n> operator^(matrix<t, n, n> mat, int p) {
 	}
 
 	return ans;
+}
+
+template<typename t, int n>
+matrix<t, n, n> operator^(matrix<t, n, n> const& mat, int p) {
+	return power(mat, p);
 }
 
 template<typename t, int n>
