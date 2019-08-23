@@ -10,13 +10,14 @@ namespace math {
 template<typename t, int n, int m>
 class matrix {
 public:
+	// Initialization of the matrix
 	matrix(t i_val = t()) {
 		for (int i = 0; i < n; i++)
 			for(int j = 0; j < m; j++)
 				v[i][j] = i_val;
 	}
 
-
+	// Matrix identity
 	static matrix<t, n, n> identity() {
 		matrix<t, n, n> ans{};
 		for (int i = 0; i < n; i++)
@@ -55,6 +56,7 @@ public:
 		return v[i];
 	}
 
+	// TRANSPOSE A MATRIX
 	matrix<t, m, n> transpose() const {
 		matrix<t, m, n> ans;
 		for (int i = 0; i < n; i++)
@@ -63,6 +65,7 @@ public:
 		return ans;
 	}
 
+	// Transpose
 	matrix<t, m, n> operator~() const {
 		return transpose();
 	}
@@ -79,6 +82,7 @@ public:
 		for(int i = 0; i < n; i++)
 			for(int j = 0; j < m; j++)
 				ans[i][j] = v[i][j] + rhs[i][j];
+		return ans;
 	}
 
 	matrix<t, n, m>& operator+=(matrix<t, n, m> const& rhs) {
@@ -93,6 +97,7 @@ public:
 		for(int i = 0; i < n; i++)
 			for(int j = 0; j < m; j++)
 				ans[i][j] = v[i][j] - rhs[i][j];
+		return ans;
 	}
 
 	matrix<t, n, m>& operator-=(matrix<t, n, m> const& rhs) {
@@ -195,7 +200,6 @@ matrix<t, n, m> operator%=(matrix<t, n, m>& lhs, matrix<t, n, m> const& rhs) {
 
 
 // POWER OPERATOR
-
 template<typename t, int n>
 matrix<t, n, n> power(matrix<t, n, n> mat, int p) {
 
@@ -210,6 +214,7 @@ matrix<t, n, n> power(matrix<t, n, n> mat, int p) {
 	matrix<t, n, n> ans;
 
 	while(p) {
+
 		if(p&1) {
 			if(used) ans *= mat;
 			else ans = mat, used = true;
