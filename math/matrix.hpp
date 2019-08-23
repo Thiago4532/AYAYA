@@ -16,6 +16,14 @@ public:
 				v[i][j] = i_val;
 	}
 
+
+	static matrix<t, n, n> identity() {
+		matrix<t, n, n> ans{};
+		for (int i = 0; i < n; i++)
+			ans.v[i][i] = 1;
+		return ans;
+	}
+
 	matrix(std::initializer_list<std::initializer_list<t>> const& l) {
 		if(l.size() != n)
 			throw std::runtime_error("matrix(initializer_list): row size error");
@@ -154,8 +162,8 @@ matrix<t, n, m> apply(matrix<t, n, m> const& mat, lambda const& func) {
 	return ans;
 }
 
-template<typename t, int n, int m>
-matrix<t, n, m>& apply_ref(matrix<t, n, m>& mat, std::function<t(t)> const& func) {
+template<typename t, typename lambda, int n, int m>
+matrix<t, n, m>& apply_ref(matrix<t, n, m>& mat, lambda const& func) {
 	for(int i = 0; i < n; i++) {
 		for(int j = 0; j < m; j++) {
 			mat[i][j] = func(mat[i][j]);
@@ -190,7 +198,12 @@ matrix<t, n, m> operator%=(matrix<t, n, m>& lhs, matrix<t, n, m> const& rhs) {
 
 template<typename t, int n>
 matrix<t, n, n> power(matrix<t, n, n> mat, int p) {
-	if(p <= 0)
+
+	if(p == 0) {
+		return matrix<t, n, n>::identity();
+	}
+
+	else if(p < 0)
 		throw std::runtime_error("matrix power: power error");
 
 	bool used = false;
