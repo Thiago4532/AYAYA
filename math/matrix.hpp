@@ -254,6 +254,9 @@ std::ostream& operator<<(std::ostream& out, matrix<t, n, m> const& mat) {
 template<typename t, int n>
 using rvector = matrix<t, n, 1>;
 
+template<typename t, int n>
+using cvector = matrix<t, 1, n>;
+
 template<int n, int m>
 using imat = matrix<int, n, m>;
 
